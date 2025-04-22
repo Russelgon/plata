@@ -1,0 +1,180 @@
+basePath: /api/v1
+definitions:
+  internal_transport_api.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      details: {}
+      error:
+        type: string
+    type: object
+  internal_transport_api.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  internal_transport_api.UpdateQuoteRequest:
+    properties:
+      currency:
+        description: 'например: EUR/MXN'
+        type: string
+    required:
+    - currency
+    type: object
+  internal_transport_api.UpdateQuoteResponse:
+    properties:
+      update_id:
+        type: string
+    type: object
+  plata_internal_domain_quote.Quote:
+    properties:
+      amount:
+        type: number
+      currency:
+        type: string
+      id:
+        type: string
+      idempotency_key:
+        type: string
+      status:
+        $ref: '#/definitions/plata_internal_domain_quote.Status'
+      updated_at:
+        type: string
+    type: object
+  plata_internal_domain_quote.Status:
+    enum:
+    - 0
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - StatusUnspecified
+    - StatusInProgress
+    - StatusDone
+host: localhost:8080
+info:
+  contact: {}
+  description: 'Currency quote service: async updates and retrieval'
+  license:
+    name: MIT
+  title: Quotes API
+  version: "1.0"
+paths:
+  /quotes/{id}:
+    get:
+      parameters:
+      - description: Quote update ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/internal_transport_api.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/plata_internal_domain_quote.Quote'
+              type: object
+        "400":
+          description: Error response
+          schema:
+            $ref: '#/definitions/internal_transport_api.ErrorResponse'
+        "404":
+          description: Error response
+          schema:
+            $ref: '#/definitions/internal_transport_api.ErrorResponse'
+        "500":
+          description: Error response
+          schema:
+            $ref: '#/definitions/internal_transport_api.ErrorResponse'
+      summary: Retrieve quote by ID
+      tags:
+      - quotes
+  /quotes/latest:
+    get:
+      consumes:
+      - application/json
+      description: Returns the most recent quote for a currency pair (e.g. EUR/USD)
+      parameters:
+      - description: Currency pair
+        enum:
+        - EUR/USD
+        - EUR/MXN
+        - EUR/RUB
+        in: query
+        name: currency
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/internal_transport_api.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/plata_internal_domain_quote.Quote'
+              type: object
+        "400":
+          description: Error response
+          schema:
+            $ref: '#/definitions/internal_transport_api.ErrorResponse'
+        "404":
+          description: Error response
+          schema:
+            $ref: '#/definitions/internal_transport_api.ErrorResponse'
+        "500":
+          description: Error response
+          schema:
+            $ref: '#/definitions/internal_transport_api.ErrorResponse'
+      summary: Get latest quote
+      tags:
+      - quotes
+  /quotes/update:
+    post:
+      consumes:
+      - application/json
+      description: Asynchronously request a quote update for a currency pair
+      parameters:
+      - description: Currency pair
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_transport_api.UpdateQuoteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/internal_transport_api.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_transport_api.UpdateQuoteResponse'
+              type: object
+        "400":
+          description: Error response
+          schema:
+            $ref: '#/definitions/internal_transport_api.ErrorResponse'
+        "500":
+          description: Error response
+          schema:
+            $ref: '#/definitions/internal_transport_api.ErrorResponse'
+      summary: Update a quote
+      tags:
+      - quotes
+schemes:
+- http
+swagger: "2.0"

@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS quotes (
+    id UUID PRIMARY KEY,
+    currency VARCHAR(20) NOT NULL,
+    amount NUMERIC(18, 6),
+    status VARCHAR(20) NOT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    idempotency_key UUID UNIQUE
+);

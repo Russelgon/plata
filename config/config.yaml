@@ -1,0 +1,19 @@
+postgres:
+  maxOpenConns: 30
+  maxIdleConns: 10
+  connMaxIdleTime: 60m
+  database: postgres
+  username: postgres
+  password: postgres
+  hostPrimary: postgres
+  hostReplica: postgres
+  port: 5432
+  sslmode: "disable"
+
+exchange:
+  url: "http://api.exchangeratesapi.io/v1/latest"
+  api_key: ""
+  timeout: 5s
+
+cron:
+  schedule: "@every 2m"
