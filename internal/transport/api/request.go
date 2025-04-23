@@ -1,7 +1,7 @@
 package api
 
 type UpdateQuoteRequest struct {
-	Currency string `json:"currency" binding:"required,len=7"` // например: EUR/MXN
+	Currency string `json:"currency" binding:"required,len=7"`
 }
 
 type UpdateQuoteResponse struct {
